@@ -743,6 +743,11 @@
             
             // Show action buttons
             actionButtons.classList.add('visible');
+            
+            // Auto-scroll to button smoothly
+            setTimeout(() => {
+                actionButtons.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
         }
 
         // Copy and redirect to Google
