@@ -752,10 +752,35 @@
                 return;
             }
             
+            let copySuccess = false;
+            
+            // Try modern clipboard API first
             try {
-                // Copy to clipboard
                 await navigator.clipboard.writeText(selectedReview);
-                
+                copySuccess = true;
+            } catch (err) {
+                // Fallback for mobile/older browsers
+                try {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = selectedReview;
+                    textArea.style.position = 'fixed';
+                    textArea.style.left = '-999999px';
+                    textArea.style.top = '-999999px';
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    copySuccess = document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                } catch (err2) {
+                    // If all fails, show manual copy prompt
+                    const userCopy = prompt('Copy this review (tap and hold to select all):\n\n' + selectedReview);
+                    if (userCopy !== null) {
+                        copySuccess = true;
+                    }
+                }
+            }
+            
+            if (copySuccess) {
                 // Show success
                 ratingSection.style.display = 'none';
                 reviewSection.style.display = 'none';
@@ -765,8 +790,8 @@
                 setTimeout(() => {
                     window.open('https://www.google.com/search?sca_esv=fec7a8aac00c39eb&sxsrf=ANbL-n7Ve9KEyjIsXhOaN4PQnoH-51bEsw:1777487541141&si=AL3DRZHrmvnFAVQPOO2Bzhf8AX9KZZ6raUI_dT7DG_z0kV2_xzy2uVbAdzEwvT53HvojwUZNra4LeWHmvEl_Tv2tL99hv2Da_sZw70Mg4FqekydTqOYB-rVRidT-vu7fjhImFq7PzJeNVONFtMHUouz0kIhhSpxJYg%3D%3D&q=Adams+Telecom+Systems+Reviews&sa=X&ved=2ahUKEwiS0u2L2ZOUAxXTEVkFHaNHIYYQ0bkNegQIKRAH&biw=1782&bih=953&dpr=1#lrd=0x885c206d68d24a43:0xc3536185d2732fc5,3,,,,', '_blank');
                 }, 1500);
-            } catch (err) {
-                alert('Failed to copy review. Please try again or copy it manually.');
+            } else {
+                alert('Please copy the review manually and then click OK to open Google Reviews.');
             }
         }
 
