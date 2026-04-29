@@ -752,6 +752,9 @@
                 return;
             }
             
+            // CRITICAL: Open Google FIRST (before any async operations) to avoid popup blockers
+            const googleWindow = window.open('https://www.google.com/search?sca_esv=fec7a8aac00c39eb&sxsrf=ANbL-n7Ve9KEyjIsXhOaN4PQnoH-51bEsw:1777487541141&si=AL3DRZHrmvnFAVQPOO2Bzhf8AX9KZZ6raUI_dT7DG_z0kV2_xzy2uVbAdzEwvT53HvojwUZNra4LeWHmvEl_Tv2tL99hv2Da_sZw70Mg4FqekydTqOYB-rVRidT-vu7fjhImFq7PzJeNVONFtMHUouz0kIhhSpxJYg%3D%3D&q=Adams+Telecom+Systems+Reviews&sa=X&ved=2ahUKEwiS0u2L2ZOUAxXTEVkFHaNHIYYQ0bkNegQIKRAH&biw=1782&bih=953&dpr=1#lrd=0x885c206d68d24a43:0xc3536185d2732fc5,3,,,,', '_blank');
+            
             let copySuccess = false;
             
             // Try modern clipboard API first
@@ -780,18 +783,16 @@
                 }
             }
             
-            if (copySuccess) {
-                // Show success
-                ratingSection.style.display = 'none';
-                reviewSection.style.display = 'none';
-                successMessage.classList.add('visible');
-                
-                // Redirect after delay
+            // Show success message
+            ratingSection.style.display = 'none';
+            reviewSection.style.display = 'none';
+            successMessage.classList.add('visible');
+            
+            // If Google didn't open (popup blocked), show alert
+            if (!googleWindow || googleWindow.closed || typeof googleWindow.closed === 'undefined') {
                 setTimeout(() => {
-                    window.open('https://www.google.com/search?sca_esv=fec7a8aac00c39eb&sxsrf=ANbL-n7Ve9KEyjIsXhOaN4PQnoH-51bEsw:1777487541141&si=AL3DRZHrmvnFAVQPOO2Bzhf8AX9KZZ6raUI_dT7DG_z0kV2_xzy2uVbAdzEwvT53HvojwUZNra4LeWHmvEl_Tv2tL99hv2Da_sZw70Mg4FqekydTqOYB-rVRidT-vu7fjhImFq7PzJeNVONFtMHUouz0kIhhSpxJYg%3D%3D&q=Adams+Telecom+Systems+Reviews&sa=X&ved=2ahUKEwiS0u2L2ZOUAxXTEVkFHaNHIYYQ0bkNegQIKRAH&biw=1782&bih=953&dpr=1#lrd=0x885c206d68d24a43:0xc3536185d2732fc5,3,,,,', '_blank');
-                }, 1500);
-            } else {
-                alert('Please copy the review manually and then click OK to open Google Reviews.');
+                    alert('Review copied! Please allow popups and try again, or manually open Google Reviews.');
+                }, 500);
             }
         }
 
