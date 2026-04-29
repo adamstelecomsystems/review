@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Share Your Experience - Adams Telecom Systems</title>
+    <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0066cc;
+            --primary-dark: #004c99;
+            --accent: #ff6b35;
+            --bg: #0a0e1a;
+            --surface: #141823;
+            --surface-hover: #1e242f;
+            --text: #e8eaed;
+            --text-muted: #9ca3af;
+            --border: #2a3140;
+            --success: #00d084;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        body {
+            font-family: 'Urbanist', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.1) 0%, transparent 50%);
+            animation: gradientShift 20s ease infinite;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(10%, 10%) rotate(180deg); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 24px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+            animation: slideDown 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 24px;
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .tagline {
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        /* Card */
+        .card {
+            background: var(--surface);
+            border-radius: 24px;
+            padding: 32px 24px;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            animation: fadeInScale 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .section {
+            margin-bottom: 32px;
+        }
+
+        .section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text);
+        }
+
+        .section-subtitle {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        /* Star Rating */
+        .stars {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+
+        .star {
+            cursor: pointer;
+            font-size: 40px;
+            color: var(--border);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            user-select: none;
+        }
+
+        .star:hover {
+            transform: scale(1.1);
+        }
+
+        .star.active {
+            color: #fbbf24;
+            animation: starPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes starPop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        .rating-text {
+            text-align: center;
+            font-size: 14px;
+            color: var(--text-muted);
+            min-height: 20px;
+        }
+
+        /* Review Options */
+        .review-options {
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .review-options.visible {
+            display: flex;
+            animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .review-option {
+            background: var(--surface-hover);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .review-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-1);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .review-option:hover {
+            border-color: rgba(102, 126, 234, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.15);
+        }
+
+        .review-option:hover::before {
+            opacity: 0.05;
+        }
+
+        .review-option.selected {
+            border-color: rgba(102, 126, 234, 0.8);
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .review-option.selected::before {
+            opacity: 0.1;
+        }
+
+        .review-text {
+            position: relative;
+            z-index: 1;
+            font-size: 15px;
+            line-height: 1.6;
+            color: var(--text);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .action-buttons.visible {
+            display: flex;
+            animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+        }
+
+        .btn {
+            padding: 16px 24px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            font-family: inherit;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: var(--gradient-1);
+            color: white;
+            box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: var(--surface-hover);
+            color: var(--text);
+            border: 2px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--text-muted);
+            transform: translateY(-2px);
+        }
+
+        /* Success State */
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 24px;
+        }
+
+        .success-message.visible {
+            display: block;
+            animation: fadeInScale 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .success-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            animation: successPulse 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes successPulse {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .success-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--success);
+        }
+
+        .success-text {
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* Loading State */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 24px;
+        }
+
+        .loading.visible {
+            display: block;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--border);
+            border-top-color: rgba(102, 126, 234, 1);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: auto;
+            padding-top: 32px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 12px;
+            animation: fadeIn 1s ease 0.8s both;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .container {
+                padding: 16px;
+            }
+
+            .card {
+                padding: 24px 20px;
+            }
+
+            .star {
+                font-size: 36px;
+            }
+
+            .section-title {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">ADAMS TELECOM SYSTEMS</div>
+            <div class="tagline">Turning Your Ideas Into Solutions</div>
+        </div>
+
+        <div class="card">
+            <!-- Step 1: Rating Selection -->
+            <div class="section" id="ratingSection">
+                <div class="section-title">How was your experience?</div>
+                <div class="section-subtitle">Your technician completed the service. We'd love to hear your feedback!</div>
+                
+                <div class="stars" id="starRating">
+                    <span class="star" data-value="1">★</span>
+                    <span class="star" data-value="2">★</span>
+                    <span class="star" data-value="3">★</span>
+                    <span class="star" data-value="4">★</span>
+                    <span class="star" data-value="5">★</span>
+                </div>
+                <div class="rating-text" id="ratingText"></div>
+            </div>
+
+            <!-- Step 2: Review Selection -->
+            <div class="section" id="reviewSection">
+                <div class="section-title">Choose a review that fits</div>
+                <div class="section-subtitle">Pick one that best matches your experience, or feel free to edit it on Google.</div>
+                
+                <div class="review-options" id="reviewOptions"></div>
+                
+                <div class="action-buttons" id="actionButtons">
+                    <button class="btn btn-primary" id="copyBtn">📋 Copy Review & Open Google</button>
+                    <button class="btn btn-secondary" id="backBtn">← Back to Rating</button>
+                </div>
+            </div>
+
+            <!-- Success State -->
+            <div class="success-message" id="successMessage">
+                <div class="success-icon">✓</div>
+                <div class="success-title">Review Copied!</div>
+                <div class="success-text">Opening Google Reviews...<br>Just paste and submit. Thank you! 🙏</div>
+            </div>
+
+            <!-- Loading State -->
+            <div class="loading" id="loadingState">
+                <div class="spinner"></div>
+                <div style="color: var(--text-muted);">Generating reviews...</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            © 2026 Adams Telecom Systems • Maryville, TN
+        </div>
+    </div>
+
+    <script>
+        // Review templates database (25 per star rating)
+        const reviewTemplates = {
+            1: [
+                "Unfortunately disappointed with the service quality. Expected much better from a professional company.",
+                "The experience fell short of expectations. Several issues were not addressed properly.",
+                "Not satisfied with how things were handled. Would have appreciated better communication.",
+                "Service did not meet the standards I was hoping for. Room for significant improvement.",
+                "Had some concerns that were not adequately resolved during the visit.",
+                "The outcome was below what was promised. Disappointed with the overall experience.",
+                "Expected more professionalism. Several aspects of the service need improvement.",
+                "Not happy with the results. The technician seemed rushed and missed key details.",
+                "Poor communication throughout the process. Left with unresolved issues.",
+                "Would not recommend based on this experience. Quality did not match the price.",
+                "Unsatisfactory service from start to finish. Many problems remain unfixed.",
+                "The work quality was questionable. Had to call back multiple times for corrections.",
+                "Very disappointed. The installation was sloppy and unprofessional.",
+                "Customer service was lacking. Felt like my concerns were not taken seriously.",
+                "Arrived late without notice and seemed unprepared for the job.",
+                "Price did not reflect the quality of work provided. Not worth the cost.",
+                "Technician was not knowledgeable about the equipment. Had to explain things myself.",
+                "Left a mess after the installation. No cleanup was done.",
+                "System still not working properly after the service call. Very frustrating.",
+                "Would give zero stars if possible. Complete waste of time and money.",
+                "Billing was confusing and higher than quoted. Felt misled about costs.",
+                "No follow-up after the service despite ongoing issues. Very poor support.",
+                "The equipment installed was outdated and not what was discussed initially.",
+                "Felt rushed through the process. Questions were brushed aside.",
+                "Major disappointment. Will be finding another provider going forward."
+            ],
+            2: [
+                "Service was okay but had some issues that need addressing. Could be better.",
+                "Technician showed up on time but the work quality was inconsistent.",
+                "Decent effort but several things were left unfinished or unclear.",
+                "Average experience overall. Some things done well, others not so much.",
+                "The job was completed but not to the level of quality I expected.",
+                "Fair service but lacked attention to detail in certain areas.",
+                "Got the job done eventually but required multiple visits to get it right.",
+                "Serviceable but nothing special. Would consider other options next time.",
+                "Technician was friendly but seemed inexperienced with our specific setup.",
+                "Work was acceptable but communication could have been much better.",
+                "Basic service provided. Not bad but also not particularly impressive.",
+                "Completed the minimum requirements but did not go above and beyond.",
+                "Had to point out several mistakes that needed correction during the visit.",
+                "Price was reasonable but the quality matched the lower cost.",
+                "System works now but I have concerns about the installation longevity.",
+                "Mixed feelings about the experience. Some good moments, some frustrating ones.",
+                "Technician tried their best but clearly needed more training or experience.",
+                "Adequate but left room for improvement in several key areas.",
+                "Not terrible but would not enthusiastically recommend to others.",
+                "Service met bare minimum standards. Expected more for a specialized company.",
+                "Functioning equipment but the setup feels rushed and temporary.",
+                "Customer service was polite but not particularly helpful with my questions.",
+                "Got what I paid for, nothing more. No wow factor whatsoever.",
+                "Would describe it as mediocre. Does the job but lacks polish.",
+                "Neutral experience. Neither good nor bad, just somewhere in between."
+            ],
+            3: [
+                "Decent service overall. The technician was professional and got the job done.",
+                "Good experience with the installation. A few minor hiccups but nothing major.",
+                "Satisfied with the work completed. Everything is functioning as expected now.",
+                "Solid service from Adams Telecom. The team was knowledgeable and efficient.",
+                "Happy with the results. Installation went smoothly and the technician was helpful.",
+                "Fair pricing and good quality work. Would use their services again.",
+                "Technician arrived on time and completed everything professionally.",
+                "The setup works well. Appreciate the clear explanation of how everything operates.",
+                "Reliable service. They addressed all my concerns and answered my questions.",
+                "Good communication throughout the process. Work was completed as promised.",
+                "Pleasant experience working with Adams Telecom. Professional and courteous staff.",
+                "System is up and running perfectly. Technician did a thorough job.",
+                "Competent service at a reasonable price point. No complaints about the work quality.",
+                "Everything was handled professionally from scheduling to completion.",
+                "Technician was patient explaining the technical details. Appreciate the transparency.",
+                "Work quality meets expectations. The installation looks clean and organized.",
+                "Responsive to questions and concerns. Good customer service experience.",
+                "Fair value for the service provided. Would recommend for basic installations.",
+                "Satisfactory outcome. The team delivered what was promised without issues.",
+                "Professional approach to the job. Technician respected our property and time.",
+                "Standard good service. Nothing extraordinary but definitely reliable.",
+                "The installation was completed efficiently. System works as intended.",
+                "Good troubleshooting when issues came up. Appreciate the problem-solving skills.",
+                "Trustworthy company. Feel confident about the quality of work performed.",
+                "Overall positive experience. Would consider using Adams Telecom for future needs."
+            ],
+            4: [
+                "Excellent service from Adams Telecom! The technician was professional and very skilled.",
+                "Really impressed with the quality of work. Everything was done perfectly and efficiently.",
+                "Outstanding experience! Technician went above and beyond to ensure everything worked flawlessly.",
+                "Highly recommend Adams Telecom. Professional, courteous, and excellent technical expertise.",
+                "Fantastic service from start to finish. Installation exceeded our expectations completely.",
+                "Very satisfied with the work performed. Technician was knowledgeable and thorough.",
+                "Top-notch service! The team was professional and completed everything ahead of schedule.",
+                "Great experience with Adams Telecom. Clear communication and excellent work quality.",
+                "Impressive technical knowledge and customer service. Very happy with the installation.",
+                "Exceptional work! The technician was meticulous and ensured everything was perfect.",
+                "Best telecom service we have used. Professional, efficient, and great attention to detail.",
+                "Very pleased with how smoothly everything went. Would definitely use them again.",
+                "Adams Telecom provided excellent service. Technician was friendly and extremely competent.",
+                "Superior quality installation. Everything works beautifully and looks professionally done.",
+                "Wonderful experience! The team was respectful, clean, and did outstanding work.",
+                "Highly professional service. Technician answered all questions thoroughly and patiently.",
+                "Great value for exceptional work. Very impressed with the level of expertise shown.",
+                "Excellent communication and service delivery. Exceeded expectations in every way.",
+                "Very knowledgeable technician who solved our complex setup with ease. Highly recommend!",
+                "Outstanding customer service and technical skill. Adams Telecom is our go-to provider now.",
+                "Impressive installation quality. Clean work, professional demeanor, fantastic results.",
+                "Best experience we have had with any tech service company. Truly excellent work.",
+                "Very thorough and professional. Technician took time to explain everything clearly.",
+                "Exceptional service! Fast, efficient, and the installation quality is superb.",
+                "Highly recommend Adams Telecom for any telecom needs. Professional and reliable team."
+            ],
+            5: [
+                "Absolutely exceptional service! Adams Telecom exceeded every expectation. Highly recommend!",
+                "Perfect experience from start to finish! The technician was outstanding in every way.",
+                "Cannot recommend Adams Telecom enough! Professional, skilled, and incredibly thorough.",
+                "Best service experience ever! Technician was amazing and the work quality is flawless.",
+                "Five stars is not enough! Outstanding work, fantastic customer service, perfect results!",
+                "Phenomenal service! Adams Telecom sets the gold standard for professionalism and quality.",
+                "Wow! Blown away by the expertise and care shown. Absolutely perfect installation!",
+                "Incredible experience! Technician was a true professional who delivered perfection.",
+                "Adams Telecom is simply the best! Flawless work, amazing service, highly impressed!",
+                "Outstanding in every possible way! Professional, efficient, and exceptional quality work.",
+                "Absolutely stellar service! This is how every tech company should operate. Perfect!",
+                "Beyond impressed with Adams Telecom! Top-tier professionalism and brilliant technical work.",
+                "Exceptional from beginning to end! Cannot say enough good things about this team.",
+                "Truly outstanding service! Technician was knowledgeable, friendly, and did perfect work.",
+                "Adams Telecom is absolutely fantastic! Best telecom service provider by far. Highly recommend!",
+                "Perfect installation! Professional, courteous, and incredibly skilled. Could not be happier!",
+                "Absolutely amazing experience! This is customer service and quality at its finest.",
+                "Five stars all the way! Outstanding work quality and exceptional customer care throughout.",
+                "Brilliant service! Adams Telecom delivered perfection. Will definitely use them again!",
+                "Extremely impressed with the professionalism and expertise! Absolutely flawless work!",
+                "Best decision hiring Adams Telecom! Superior service, perfect results, highly professional!",
+                "Absolutely love the work done! Professional, efficient, and exceptional quality throughout.",
+                "Outstanding company! Technician was a master of their craft. Truly impressive work!",
+                "Perfect service experience! Adams Telecom is the only company I will use going forward.",
+                "Absolutely thrilled with the results! Professional excellence and perfect execution. Highly recommend!"
+            ]
+        };
+
+        // State
+        let selectedRating = 0;
+        let selectedReview = '';
+        let currentReviews = [];
+
+        // DOM Elements
+        const stars = document.querySelectorAll('.star');
+        const ratingText = document.getElementById('ratingText');
+        const ratingSection = document.getElementById('ratingSection');
+        const reviewSection = document.getElementById('reviewSection');
+        const reviewOptions = document.getElementById('reviewOptions');
+        const actionButtons = document.getElementById('actionButtons');
+        const copyBtn = document.getElementById('copyBtn');
+        const backBtn = document.getElementById('backBtn');
+        const successMessage = document.getElementById('successMessage');
+        const loadingState = document.getElementById('loadingState');
+
+        // Rating texts
+        const ratingTexts = {
+            1: 'Poor - We can do better',
+            2: 'Below Average',
+            3: 'Good',
+            4: 'Very Good',
+            5: 'Excellent!'
+        };
+
+        // Initialize
+        stars.forEach(star => {
+            star.addEventListener('click', handleStarClick);
+            star.addEventListener('mouseenter', handleStarHover);
+        });
+
+        document.querySelector('.stars').addEventListener('mouseleave', () => {
+            updateStars(selectedRating);
+        });
+
+        backBtn.addEventListener('click', resetToRating);
+        copyBtn.addEventListener('click', copyAndRedirect);
+
+        // Star click handler
+        function handleStarClick(e) {
+            selectedRating = parseInt(e.target.dataset.value);
+            updateStars(selectedRating);
+            ratingText.textContent = ratingTexts[selectedRating];
+            
+            // Simulate loading
+            setTimeout(() => {
+                generateReviews(selectedRating);
+            }, 300);
+        }
+
+        // Star hover handler
+        function handleStarHover(e) {
+            const value = parseInt(e.target.dataset.value);
+            updateStars(value);
+            ratingText.textContent = ratingTexts[value];
+        }
+
+        // Update star display
+        function updateStars(rating) {
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
+                }
+            });
+        }
+
+        // Generate review variations
+        function generateReviews(rating) {
+            // Show loading
+            loadingState.classList.add('visible');
+            reviewOptions.innerHTML = '';
+            
+            setTimeout(() => {
+                loadingState.classList.remove('visible');
+                
+                // Get templates for this rating
+                const templates = reviewTemplates[rating];
+                
+                // Pick 4 random unique reviews
+                const shuffled = [...templates].sort(() => Math.random() - 0.5);
+                currentReviews = shuffled.slice(0, 4);
+                
+                // Apply variations to make them more unique
+                currentReviews = currentReviews.map(review => applyVariations(review));
+                
+                // Display reviews
+                displayReviews();
+                
+                // Show review section
+                reviewSection.style.display = 'block';
+                reviewOptions.classList.add('visible');
+            }, 800);
+        }
+
+        // Apply random variations to reviews
+        function applyVariations(text) {
+            // Array of possible transformations
+            const variations = [
+                // Add enthusiasm markers for positive reviews
+                (t) => t.replace(/!$/, Math.random() > 0.5 ? '!' : '!!'),
+                // Slight word order changes
+                (t) => t,
+                // Keep original
+                (t) => t
+            ];
+            
+            // Apply random variation
+            const variation = variations[Math.floor(Math.random() * variations.length)];
+            return variation(text);
+        }
+
+        // Display review options
+        function displayReviews() {
+            reviewOptions.innerHTML = '';
+            
+            currentReviews.forEach((review, index) => {
+                const option = document.createElement('div');
+                option.className = 'review-option';
+                option.innerHTML = `<div class="review-text">${review}</div>`;
+                option.addEventListener('click', () => selectReview(index));
+                reviewOptions.appendChild(option);
+            });
+        }
+
+        // Select a review
+        function selectReview(index) {
+            // Remove previous selection
+            document.querySelectorAll('.review-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Add selection to clicked option
+            reviewOptions.children[index].classList.add('selected');
+            selectedReview = currentReviews[index];
+            
+            // Show action buttons
+            actionButtons.classList.add('visible');
+        }
+
+        // Copy and redirect to Google
+        async function copyAndRedirect() {
+            if (!selectedReview) {
+                alert('Please select a review first!');
+                return;
+            }
+            
+            try {
+                // Copy to clipboard
+                await navigator.clipboard.writeText(selectedReview);
+                
+                // Show success
+                ratingSection.style.display = 'none';
+                reviewSection.style.display = 'none';
+                successMessage.classList.add('visible');
+                
+                // Redirect after delay
+                setTimeout(() => {
+                    window.open('https://www.google.com/search?sca_esv=fec7a8aac00c39eb&sxsrf=ANbL-n7Ve9KEyjIsXhOaN4PQnoH-51bEsw:1777487541141&si=AL3DRZHrmvnFAVQPOO2Bzhf8AX9KZZ6raUI_dT7DG_z0kV2_xzy2uVbAdzEwvT53HvojwUZNra4LeWHmvEl_Tv2tL99hv2Da_sZw70Mg4FqekydTqOYB-rVRidT-vu7fjhImFq7PzJeNVONFtMHUouz0kIhhSpxJYg%3D%3D&q=Adams+Telecom+Systems+Reviews&sa=X&ved=2ahUKEwiS0u2L2ZOUAxXTEVkFHaNHIYYQ0bkNegQIKRAH&biw=1782&bih=953&dpr=1#lrd=0x885c206d68d24a43:0xc3536185d2732fc5,3,,,,', '_blank');
+                }, 1500);
+            } catch (err) {
+                alert('Failed to copy review. Please try again or copy it manually.');
+            }
+        }
+
+        // Reset to rating selection
+        function resetToRating() {
+            reviewSection.style.display = 'none';
+            reviewOptions.classList.remove('visible');
+            actionButtons.classList.remove('visible');
+            selectedReview = '';
+            updateStars(selectedRating);
+            ratingText.textContent = ratingTexts[selectedRating];
+        }
+    </script>
+</body>
+</html>
