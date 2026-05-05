@@ -39,7 +39,7 @@ function drawRoundedRect(ctx: CanvasRenderingContext2D, x: number, y: number, w:
 function generateBrandedCard(qrSvgEl: Element, biz: BizData): Promise<string> {
   return new Promise((resolve) => {
     const W = 480;
-    const H = 680;
+    const H = 570;
     const color = biz.primary_color || C.primary;
     const initials = biz.name.split(' ').map((w) => w[0]).join('').toUpperCase().slice(0, 2);
 
@@ -66,51 +66,51 @@ function generateBrandedCard(qrSvgEl: Element, biz: BizData): Promise<string> {
 
     // Logo circle
     const cx = W / 2;
-    const logoR = 28;
-    const logoY = 52;
+    const logoR = 26;
+    const logoY = 46;
     ctx.fillStyle = color;
     ctx.beginPath();
     ctx.arc(cx, logoY, logoR, 0, Math.PI * 2);
     ctx.fill();
 
     ctx.fillStyle = '#FFFFFF';
-    ctx.font = `700 ${initials.length > 1 ? 15 : 18}px -apple-system, sans-serif`;
+    ctx.font = `700 ${initials.length > 1 ? 14 : 17}px -apple-system, sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(initials, cx, logoY + 1);
 
     // Business name
     ctx.fillStyle = '#111827';
-    ctx.font = `700 18px -apple-system, sans-serif`;
+    ctx.font = `700 17px -apple-system, sans-serif`;
     ctx.textBaseline = 'alphabetic';
-    ctx.fillText(biz.name, cx, 106);
+    ctx.fillText(biz.name, cx, 96);
 
     // Business type
     ctx.fillStyle = '#9CA3AF';
-    ctx.font = `400 11px -apple-system, sans-serif`;
-    ctx.fillText((biz.type || 'Local Business').toUpperCase(), cx, 124);
+    ctx.font = `400 10px -apple-system, sans-serif`;
+    ctx.fillText((biz.type || 'Local Business').toUpperCase(), cx, 112);
 
     // Divider
     ctx.strokeStyle = '#F3F4F6';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(48, 142);
-    ctx.lineTo(W - 48, 142);
+    ctx.moveTo(48, 128);
+    ctx.lineTo(W - 48, 128);
     ctx.stroke();
 
     // CTA text
     ctx.fillStyle = '#374151';
-    ctx.font = `500 13px -apple-system, sans-serif`;
-    ctx.fillText('Share your experience with us', cx, 165);
+    ctx.font = `500 12px -apple-system, sans-serif`;
+    ctx.fillText('Share your experience with us', cx, 148);
     ctx.fillStyle = '#9CA3AF';
     ctx.font = `400 11px -apple-system, sans-serif`;
-    ctx.fillText('Scan to leave a Google review', cx, 182);
+    ctx.fillText('Scan to leave a Google review', cx, 163);
 
-    // QR code area — clean white box with light border
-    const qrSize = 220;
+    // QR code area
+    const qrSize = 210;
     const qrX = (W - qrSize) / 2;
-    const qrY = 204;
-    const qrPad = 16;
+    const qrY = 182;
+    const qrPad = 14;
     const boxX = qrX - qrPad;
     const boxY = qrY - qrPad;
     const boxW = qrSize + qrPad * 2;
@@ -159,7 +159,7 @@ function generateBrandedCard(qrSvgEl: Element, biz: BizData): Promise<string> {
       ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
       URL.revokeObjectURL(svgUrl);
 
-      const bottomY = boxY + boxH + 28;
+      const bottomY = boxY + boxH + 20;
 
       // Divider
       ctx.strokeStyle = '#F3F4F6';
