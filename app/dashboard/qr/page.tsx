@@ -20,7 +20,7 @@ const sizeOptions = [
   { label: 'L', size: 240, px: 'Large (240px)' },
 ];
 
-type BizData = { slug: string; name: string; type: string; primary_color: string };
+type BizData = { slug: string; name: string; type: string; primary_color: string; website: string };
 
 function drawRoundedRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
   ctx.beginPath();
@@ -36,10 +36,10 @@ function drawRoundedRect(ctx: CanvasRenderingContext2D, x: number, y: number, w:
   ctx.closePath();
 }
 
-function generateBrandedCard(qrSvgEl: Element, biz: BizData, qrUrl: string): Promise<string> {
+function generateBrandedCard(qrSvgEl: Element, biz: BizData): Promise<string> {
   return new Promise((resolve) => {
-    const W = 600;
-    const H = 820;
+    const W = 480;
+    const H = 680;
     const color = biz.primary_color || C.primary;
     const initials = biz.name.split(' ').map((w) => w[0]).join('').toUpperCase().slice(0, 2);
 
@@ -49,153 +49,149 @@ function generateBrandedCard(qrSvgEl: Element, biz: BizData, qrUrl: string): Pro
     const ctx = canvas.getContext('2d')!;
     ctx.scale(2, 2);
 
-    // Background
+    // White background
     ctx.fillStyle = '#FFFFFF';
     ctx.fillRect(0, 0, W, H);
 
-    // Top color bar
+    // Top accent bar
     ctx.fillStyle = color;
-    ctx.fillRect(0, 0, W, 7);
+    ctx.fillRect(0, 0, W, 5);
 
-    // Subtle top pattern dots
-    ctx.fillStyle = `${color}12`;
-    for (let i = 0; i < 8; i++) {
-      for (let j = 0; j < 3; j++) {
-        ctx.beginPath();
-        ctx.arc(60 + i * 72, 50 + j * 28, 3, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
+    // Very subtle bg tint at top
+    const topGrad = ctx.createLinearGradient(0, 5, 0, 120);
+    topGrad.addColorStop(0, `${color}08`);
+    topGrad.addColorStop(1, '#FFFFFF');
+    ctx.fillStyle = topGrad;
+    ctx.fillRect(0, 5, W, 115);
 
     // Logo circle
     const cx = W / 2;
-    const logoY = 60;
-    const logoR = 36;
-    const gradient = ctx.createRadialGradient(cx - 8, logoY - 8, 4, cx, logoY, logoR);
-    gradient.addColorStop(0, `${color}DD`);
-    gradient.addColorStop(1, color);
-    ctx.fillStyle = gradient;
+    const logoR = 28;
+    const logoY = 52;
+    ctx.fillStyle = color;
     ctx.beginPath();
     ctx.arc(cx, logoY, logoR, 0, Math.PI * 2);
     ctx.fill();
 
     ctx.fillStyle = '#FFFFFF';
-    ctx.font = `700 ${initials.length > 1 ? 18 : 22}px -apple-system, BlinkMacSystemFont, sans-serif`;
+    ctx.font = `700 ${initials.length > 1 ? 15 : 18}px -apple-system, sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(initials, cx, logoY + 1);
 
     // Business name
     ctx.fillStyle = '#111827';
-    ctx.font = `700 22px -apple-system, BlinkMacSystemFont, sans-serif`;
-    ctx.textAlign = 'center';
+    ctx.font = `700 18px -apple-system, sans-serif`;
     ctx.textBaseline = 'alphabetic';
-    ctx.fillText(biz.name, cx, 128);
+    ctx.fillText(biz.name, cx, 106);
 
     // Business type
-    ctx.fillStyle = '#6B7280';
-    ctx.font = `400 13px -apple-system, BlinkMacSystemFont, sans-serif`;
-    ctx.fillText(biz.type || 'Local Business', cx, 150);
+    ctx.fillStyle = '#9CA3AF';
+    ctx.font = `400 11px -apple-system, sans-serif`;
+    ctx.fillText((biz.type || 'Local Business').toUpperCase(), cx, 124);
 
     // Divider
-    ctx.strokeStyle = '#E5E7EB';
+    ctx.strokeStyle = '#F3F4F6';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(60, 172);
-    ctx.lineTo(W - 60, 172);
+    ctx.moveTo(48, 142);
+    ctx.lineTo(W - 48, 142);
     ctx.stroke();
 
-    // Tagline
+    // CTA text
     ctx.fillStyle = '#374151';
-    ctx.font = `600 15px -apple-system, BlinkMacSystemFont, sans-serif`;
-    ctx.fillText('How was your experience?', cx, 200);
+    ctx.font = `500 13px -apple-system, sans-serif`;
+    ctx.fillText('Share your experience with us', cx, 165);
     ctx.fillStyle = '#9CA3AF';
-    ctx.font = `400 12px -apple-system, BlinkMacSystemFont, sans-serif`;
-    ctx.fillText('Scan the QR code to leave us a review', cx, 220);
+    ctx.font = `400 11px -apple-system, sans-serif`;
+    ctx.fillText('Scan to leave a Google review', cx, 182);
 
-    // QR code card shadow
-    const qrCardX = 80;
-    const qrCardY = 244;
-    const qrCardW = W - 160;
-    const qrCardH = qrCardW;
+    // QR code area — clean white box with light border
+    const qrSize = 220;
+    const qrX = (W - qrSize) / 2;
+    const qrY = 204;
+    const qrPad = 16;
+    const boxX = qrX - qrPad;
+    const boxY = qrY - qrPad;
+    const boxW = qrSize + qrPad * 2;
+    const boxH = qrSize + qrPad * 2;
 
-    ctx.shadowColor = 'rgba(0,0,0,0.08)';
-    ctx.shadowBlur = 20;
-    ctx.shadowOffsetY = 4;
-    drawRoundedRect(ctx, qrCardX, qrCardY, qrCardW, qrCardH, 16);
+    ctx.shadowColor = 'rgba(0,0,0,0.06)';
+    ctx.shadowBlur = 16;
+    ctx.shadowOffsetY = 3;
+    drawRoundedRect(ctx, boxX, boxY, boxW, boxH, 14);
     ctx.fillStyle = '#FFFFFF';
     ctx.fill();
     ctx.shadowColor = 'transparent';
     ctx.shadowBlur = 0;
     ctx.shadowOffsetY = 0;
 
-    // QR border
     ctx.strokeStyle = '#E5E7EB';
     ctx.lineWidth = 1;
-    drawRoundedRect(ctx, qrCardX, qrCardY, qrCardW, qrCardH, 16);
+    drawRoundedRect(ctx, boxX, boxY, boxW, boxH, 14);
     ctx.stroke();
 
-    // Corner accents
-    const accentSize = 20;
-    const accentPad = 14;
+    // Colored corner brackets
+    const bSize = 14;
+    const bPad = 10;
     ctx.strokeStyle = color;
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 2.5;
     ctx.lineCap = 'round';
-    const corners = [
-      [qrCardX + accentPad, qrCardY + accentPad],
-      [qrCardX + qrCardW - accentPad, qrCardY + accentPad],
-      [qrCardX + accentPad, qrCardY + qrCardH - accentPad],
-      [qrCardX + qrCardW - accentPad, qrCardY + qrCardH - accentPad],
-    ];
-    corners.forEach(([cx2, cy2], i) => {
-      const dx = i % 2 === 0 ? 1 : -1;
-      const dy = i < 2 ? 1 : -1;
+    [
+      [boxX + bPad, boxY + bPad, 1, 1],
+      [boxX + boxW - bPad, boxY + bPad, -1, 1],
+      [boxX + bPad, boxY + boxH - bPad, 1, -1],
+      [boxX + boxW - bPad, boxY + boxH - bPad, -1, -1],
+    ].forEach(([px, py, dx, dy]) => {
       ctx.beginPath();
-      ctx.moveTo(cx2 + dx * accentSize, cy2);
-      ctx.lineTo(cx2, cy2);
-      ctx.lineTo(cx2, cy2 + dy * accentSize);
+      ctx.moveTo(px + dx * bSize, py);
+      ctx.lineTo(px, py);
+      ctx.lineTo(px, py + dy * bSize);
       ctx.stroke();
     });
 
-    // Draw QR SVG into card
+    // Load and draw QR
     const svgData = new XMLSerializer().serializeToString(qrSvgEl);
     const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
     const svgUrl = URL.createObjectURL(svgBlob);
     const qrImg = new Image();
     qrImg.onload = () => {
-      const padding = 28;
-      ctx.drawImage(qrImg, qrCardX + padding, qrCardY + padding, qrCardW - padding * 2, qrCardH - padding * 2);
+      ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
       URL.revokeObjectURL(svgUrl);
 
+      const bottomY = boxY + boxH + 28;
+
       // Divider
-      ctx.strokeStyle = '#E5E7EB';
+      ctx.strokeStyle = '#F3F4F6';
       ctx.lineWidth = 1;
-      const divY = qrCardY + qrCardH + 30;
       ctx.beginPath();
-      ctx.moveTo(60, divY);
-      ctx.lineTo(W - 60, divY);
+      ctx.moveTo(48, bottomY);
+      ctx.lineTo(W - 48, bottomY);
       ctx.stroke();
 
-      // URL label
-      ctx.fillStyle = '#9CA3AF';
-      ctx.font = `400 11px -apple-system, BlinkMacSystemFont, sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.fillText('REVIEW LINK', cx, divY + 20);
+      // Website (company URL)
+      const website = biz.website
+        ? biz.website.replace(/^https?:\/\//, '').replace(/\/$/, '')
+        : '';
 
-      // URL value
-      ctx.fillStyle = color;
-      ctx.font = `500 12px 'Courier New', monospace`;
-      const displayUrl = qrUrl.replace('https://', '').replace('http://', '');
-      ctx.fillText(displayUrl, cx, divY + 38);
+      if (website) {
+        ctx.fillStyle = '#9CA3AF';
+        ctx.font = `400 10px -apple-system, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.fillText('WEBSITE', cx, bottomY + 18);
+        ctx.fillStyle = color;
+        ctx.font = `600 12px 'Courier New', monospace`;
+        ctx.fillText(website, cx, bottomY + 34);
+      }
 
-      // Bottom branding
+      // Powered by
       ctx.fillStyle = '#D1D5DB';
-      ctx.font = `400 10px -apple-system, BlinkMacSystemFont, sans-serif`;
-      ctx.fillText('Powered by ReviewBoost', cx, H - 22);
+      ctx.font = `400 9px -apple-system, sans-serif`;
+      ctx.fillText('Powered by ReviewBoost', cx, H - 16);
 
-      // Bottom color bar
+      // Bottom bar
       ctx.fillStyle = color;
-      ctx.fillRect(0, H - 7, W, 7);
+      ctx.fillRect(0, H - 5, W, 5);
 
       resolve(canvas.toDataURL('image/png'));
     };
@@ -211,7 +207,7 @@ export default function QRPage() {
 
   useEffect(() => {
     const supabase = createClient();
-    supabase.from('businesses').select('slug, name, type, primary_color').single().then(({ data }) => {
+    supabase.from('businesses').select('slug, name, type, primary_color, website').single().then(({ data }) => {
       if (data) setBiz(data);
       setLoading(false);
     });
@@ -235,7 +231,7 @@ export default function QRPage() {
     if (!qrUrl || !biz) return;
     const svg = document.querySelector('#qr-code-svg');
     if (!svg) return;
-    const dataUrl = await generateBrandedCard(svg, biz, qrUrl);
+    const dataUrl = await generateBrandedCard(svg, biz);
     const a = document.createElement('a');
     a.download = `${slug}-review-card.png`;
     a.href = dataUrl;

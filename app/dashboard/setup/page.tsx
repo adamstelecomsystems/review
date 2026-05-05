@@ -258,7 +258,7 @@ function BusinessInfoTab({
   onChange,
   onSave,
 }: {
-  info: { name: string; tagline: string; type: string; googleUrl: string };
+  info: { name: string; tagline: string; type: string; googleUrl: string; website: string };
   onChange: (key: string, val: string) => void;
   onSave: () => Promise<void>;
 }) {
@@ -299,6 +299,11 @@ function BusinessInfoTab({
             <polyline points="6 9 12 15 18 9" />
           </svg>
         </div>
+      </div>
+      <div>
+        <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: C.textMid, marginBottom: 6 }}>Company Website</label>
+        <LightInput value={info.website} onChange={(v) => onChange('website', v)} placeholder="https://adamstelecom.com" />
+        <p style={{ fontSize: 12, color: C.subtle, marginTop: 5 }}>Shown on your printed QR card</p>
       </div>
       <div>
         <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: C.textMid, marginBottom: 6 }}>Google Review URL</label>
@@ -739,6 +744,7 @@ export default function SetupPage() {
     tagline: '',
     type: 'Service/Repair',
     googleUrl: '',
+    website: '',
   });
 
   const [questions, setQuestions] = useState<StarQuestions>(INITIAL_QUESTIONS);
@@ -748,11 +754,11 @@ export default function SetupPage() {
   useEffect(() => {
     const supabase = createClient();
     (async () => {
-      const { data: biz } = await supabase.from('businesses').select('id, name, type, google_review_url, primary_color, plan').single();
+      const { data: biz } = await supabase.from('businesses').select('id, name, type, google_review_url, primary_color, plan, website').single();
       if (!biz) return;
       setBizId(biz.id);
       setPlan(biz.plan || 'free');
-      setBusinessInfo({ name: biz.name || '', tagline: '', type: biz.type || 'Service/Repair', googleUrl: biz.google_review_url || '' });
+      setBusinessInfo({ name: biz.name || '', tagline: '', type: biz.type || 'Service/Repair', googleUrl: biz.google_review_url || '', website: biz.website || '' });
       setPrimaryColor(biz.primary_color || '#0F766E');
       const auto = (biz.name || '').split(' ').map((w: string) => w[0]).join('').toUpperCase().slice(0, 2);
       setInitials(auto || 'AT');
@@ -778,6 +784,7 @@ export default function SetupPage() {
       type: businessInfo.type,
       google_review_url: businessInfo.googleUrl,
       primary_color: primaryColor,
+      website: businessInfo.website,
     }).eq('id', bizId);
   };
 
