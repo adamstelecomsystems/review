@@ -754,11 +754,11 @@ export default function SetupPage() {
   useEffect(() => {
     const supabase = createClient();
     (async () => {
-      const { data: biz } = await supabase.from('businesses').select('id, name, type, google_review_url, primary_color, plan, website').single();
+      const { data: biz } = await supabase.from('businesses').select('id, name, type, google_review_url, primary_color, plan, website, tagline').single();
       if (!biz) return;
       setBizId(biz.id);
       setPlan(biz.plan || 'free');
-      setBusinessInfo({ name: biz.name || '', tagline: '', type: biz.type || 'Service/Repair', googleUrl: biz.google_review_url || '', website: biz.website || '' });
+      setBusinessInfo({ name: biz.name || '', tagline: biz.tagline || '', type: biz.type || 'Service/Repair', googleUrl: biz.google_review_url || '', website: biz.website || '' });
       setPrimaryColor(biz.primary_color || '#0F766E');
       const auto = (biz.name || '').split(' ').map((w: string) => w[0]).join('').toUpperCase().slice(0, 2);
       setInitials(auto || 'AT');
@@ -781,6 +781,7 @@ export default function SetupPage() {
     const supabase = createClient();
     await supabase.from('businesses').update({
       name: businessInfo.name,
+      tagline: businessInfo.tagline,
       type: businessInfo.type,
       google_review_url: businessInfo.googleUrl,
       primary_color: primaryColor,

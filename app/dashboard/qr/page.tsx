@@ -20,7 +20,7 @@ const sizeOptions = [
   { label: 'L', size: 240, px: 'Large (240px)' },
 ];
 
-type BizData = { slug: string; name: string; type: string; primary_color: string; website: string };
+type BizData = { slug: string; name: string; type: string; primary_color: string; website: string; tagline: string };
 
 function drawRoundedRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
   ctx.beginPath();
@@ -39,7 +39,7 @@ function drawRoundedRect(ctx: CanvasRenderingContext2D, x: number, y: number, w:
 function generateBrandedCard(qrSvgEl: Element, biz: BizData): Promise<string> {
   return new Promise((resolve) => {
     const W = 480;
-    const H = 570;
+    const H = biz.tagline ? 590 : 570;
     const color = biz.primary_color || C.primary;
     const initials = biz.name.split(' ').map((w) => w[0]).join('').toUpperCase().slice(0, 2);
 
@@ -90,26 +90,36 @@ function generateBrandedCard(qrSvgEl: Element, biz: BizData): Promise<string> {
     ctx.font = `400 10px -apple-system, sans-serif`;
     ctx.fillText((biz.type || 'Local Business').toUpperCase(), cx, 112);
 
+    // Tagline (if set)
+    const hasTagline = !!biz.tagline;
+    if (hasTagline) {
+      ctx.fillStyle = '#6B7280';
+      ctx.font = `400 11px -apple-system, sans-serif`;
+      ctx.fillText(biz.tagline, cx, 128);
+    }
+
+    const dividerY = hasTagline ? 142 : 128;
+
     // Divider
     ctx.strokeStyle = '#F3F4F6';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(48, 128);
-    ctx.lineTo(W - 48, 128);
+    ctx.moveTo(48, dividerY);
+    ctx.lineTo(W - 48, dividerY);
     ctx.stroke();
 
     // CTA text
     ctx.fillStyle = '#374151';
     ctx.font = `500 12px -apple-system, sans-serif`;
-    ctx.fillText('Share your experience with us', cx, 148);
+    ctx.fillText('Share your experience with us', cx, dividerY + 20);
     ctx.fillStyle = '#9CA3AF';
     ctx.font = `400 11px -apple-system, sans-serif`;
-    ctx.fillText('Scan to leave a Google review', cx, 163);
+    ctx.fillText('Scan to leave a Google review', cx, dividerY + 35);
 
     // QR code area
     const qrSize = 210;
     const qrX = (W - qrSize) / 2;
-    const qrY = 182;
+    const qrY = dividerY + 54;
     const qrPad = 14;
     const boxX = qrX - qrPad;
     const boxY = qrY - qrPad;
@@ -207,7 +217,7 @@ export default function QRPage() {
 
   useEffect(() => {
     const supabase = createClient();
-    supabase.from('businesses').select('slug, name, type, primary_color, website').single().then(({ data }) => {
+    supabase.from('businesses').select('slug, name, type, primary_color, website, tagline').single().then(({ data }) => {
       if (data) setBiz(data);
       setLoading(false);
     });
