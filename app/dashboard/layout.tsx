@@ -51,7 +51,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const supabase = createClient();
     (async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) { router.push('/login'); return; }
 
       const meta = user.user_metadata;
       const name = meta?.business_name || user.email?.split('@')[0] || 'User';
